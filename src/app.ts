@@ -21,15 +21,32 @@ import AppError from './utils/AppError';
 
 const app = express();
 
+const parseOrigins = (value?: string) =>
+  value
+    ?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean) ?? [];
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+  process.env.FRONTEND_URL,
   process.env.CLIENT_URL,
+  ...parseOrigins(process.env.CORS_ORIGINS),
 ].filter((origin): origin is string => Boolean(origin));
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || allowedOrigins,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
     credentials: true,
   }),
 );

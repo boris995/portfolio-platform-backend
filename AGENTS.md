@@ -785,4 +785,19 @@ Remaining optional backend polish:
 - Add pagination/search/query filters for admin CMS resources.
 - Add automated tests around CMS validation and admin auth protection.
 - Add richer media metadata if CMS media library becomes a dedicated feature.
+
+---
+
+## CMS Work Log - 2026-05-09 Backend Continuation
+
+Implemented after the final pass:
+- Added admin CMS collection query support for `search`, `status`, `page`, and `limit`.
+- Admin CMS collection responses now include `meta` with page, limit, total, and totalPages.
+- Restored Express request type augmentation under `src/types/express/index.d.ts` so `req.user` is available to TypeScript with the current `typeRoots` setup.
+
+Validation performed:
+- `npm run build` passed.
+- Smoke tested admin CMS filtering and pagination:
+  - `GET /api/admin/cms/pages?search=about&status=published&page=1&limit=5`
+  - `GET /api/admin/cms/contact-submissions`
 Blog, media library, role system, preview mode, drag-and-drop sections — to su druge faze. Ako Codex-u odmah kažeš “napravi CMS”, vrlo lako će napraviti preširok, polufunkcionalan monstrum. Bolje ga natjerati da napravi dosadan, stabilan kostur. Dosadno je često znak da backend neće eksplodirati u petak u 23:40.
