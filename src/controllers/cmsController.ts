@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { Model, ModelStatic, Order } from 'sequelize';
+import { Op, type Model, type ModelStatic, type Order, type WhereOptions } from 'sequelize';
 import {
   CmsFaq,
   CmsPage,
@@ -50,6 +50,16 @@ const normalizePublishedAt = (
   return payload;
 };
 
+const toPositiveInt = (value: unknown, fallback: number) => {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return fallback;
+  }
+
+  return Math.floor(parsed);
+};
+
 export async function getPublicCollection(req: Request, res: Response) {
   const model = getModel(String(req.params.resource));
   const order: Order =
@@ -86,13 +96,46 @@ export async function getPublicBySlug(req: Request, res: Response) {
 
 export async function getAdminCollection(req: Request, res: Response) {
   const model = getModel(String(req.params.resource));
-  const items = await model.findAll({
+  const page = toPositiveInt(req.query.page, 1);
+  const limit = Math.min(toPositiveInt(req.query.limit, 20), 100);
+  const offset = (page - 1) * limit;
+  const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+  const status = typeof req.query.status === 'string' ? req.query.status.trim() : '';
+  const where: WhereOptions = {};
+
+  if (status === 'draft' || status === 'published' || status === 'archived') {
+    Object.assign(where, { status });
+  }
+
+  if (search) {
+    const searchableFields =
+      req.params.resource === 'faqs'
+        ? ['question', 'answer', 'category']
+        : ['title', 'slug', 'excerpt', 'content'];
+
+    Object.assign(where, {
+      [Op.or]: searchableFields.map((field) => ({
+        [field]: { [Op.like]: `%${search}%` },
+      })),
+    });
+  }
+
+  const { count, rows: items } = await model.findAndCountAll({
+    where,
     order: [['updatedAt', 'DESC']],
+    limit,
+    offset,
   });
 
   return res.status(200).json({
     success: true,
     data: items,
+    meta: {
+      page,
+      limit,
+      total: count,
+      totalPages: Math.ceil(count / limit),
+    },
   });
 }
 
