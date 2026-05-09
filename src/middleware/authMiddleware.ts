@@ -43,3 +43,34 @@ export function authMiddleware(
     });
   }
 }
+
+export function optionalAuthMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice('Bearer '.length)
+    : null;
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'development-secret',
+    ) as JwtPayload;
+
+    req.user = {
+      id: decoded.id,
+      role: decoded.role,
+    };
+  } catch {
+    // Public routes should continue without user context when optional auth fails.
+  }
+
+  return next();
+}

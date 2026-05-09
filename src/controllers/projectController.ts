@@ -9,6 +9,8 @@ type ProjectBody = {
   image?: string | null;
   githubUrl?: string | null;
   liveUrl?: string | null;
+  views?: number;
+  likes?: number;
 };
 
 const normalizeTech = (tech: ProjectBody['tech']) => {
@@ -69,6 +71,8 @@ export async function createProject(req: Request, res: Response) {
     image: body.image || null,
     githubUrl: body.githubUrl || null,
     liveUrl: body.liveUrl || null,
+    views: body.views ?? 0,
+    likes: body.likes ?? 0,
   });
 
   return res.status(201).json({
@@ -107,6 +111,8 @@ export async function updateProject(req: Request, res: Response) {
     image: body.image ?? project.image,
     githubUrl: body.githubUrl ?? project.githubUrl,
     liveUrl: body.liveUrl ?? project.liveUrl,
+    views: body.views ?? project.views,
+    likes: body.likes ?? project.likes,
   });
 
   return res.status(200).json({

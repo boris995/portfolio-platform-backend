@@ -21,6 +21,8 @@ class Project extends Model<
   declare image: CreationOptional<string | null>;
   declare githubUrl: CreationOptional<string | null>;
   declare liveUrl: CreationOptional<string | null>;
+  declare views: CreationOptional<number>;
+  declare likes: CreationOptional<number>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -65,6 +67,16 @@ Project.init(
     liveUrl: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    views: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    likes: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

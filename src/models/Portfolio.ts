@@ -36,6 +36,9 @@ class Portfolio extends Model<
   declare featured: CreationOptional<boolean>;
   declare status: CreationOptional<PortfolioStatus>;
   declare views: CreationOptional<number>;
+  declare followers: CreationOptional<number>;
+  declare likes: CreationOptional<number>;
+  declare linkClicks: CreationOptional<number>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -111,6 +114,21 @@ Portfolio.init(
       defaultValue: 'pending',
     },
     views: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    followers: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    likes: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    linkClicks: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
