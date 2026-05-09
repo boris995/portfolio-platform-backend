@@ -3,8 +3,10 @@ import cors from 'cors';
 import type { ErrorRequestHandler, RequestHandler } from 'express';
 import path from 'path';
 import adminRoutes from './routes/adminRoutes';
+import adminCmsRoutes from './routes/adminCmsRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 import authRoutes from './routes/authRoutes';
+import cmsRoutes from './routes/cmsRoutes';
 import commentRoutes from './routes/commentRoutes';
 import favoriteRoutes from './routes/favoriteRoutes';
 import notificationRoutes from './routes/notificationRoutes';
@@ -42,10 +44,12 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/cms', cmsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/portfolios', portfolioRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/cms', adminCmsRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/uploads', uploadRoutes);

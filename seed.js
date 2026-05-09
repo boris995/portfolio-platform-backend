@@ -381,6 +381,101 @@ const AnalyticsEvent = sequelize.define(
   },
 );
 
+const cmsContentFields = {
+  id: { type: DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
+  title: { type: DataTypes.STRING(180), allowNull: false },
+  slug: { type: DataTypes.STRING(140), allowNull: false, unique: true },
+  excerpt: { type: DataTypes.TEXT, allowNull: false },
+  content: { type: DataTypes.TEXT('long'), allowNull: false },
+  status: {
+    type: DataTypes.ENUM('draft', 'published', 'archived'),
+    allowNull: false,
+    defaultValue: 'draft',
+  },
+  seoTitle: { type: DataTypes.STRING(180), allowNull: true },
+  seoDescription: { type: DataTypes.STRING(260), allowNull: true },
+  featuredImageUrl: { type: DataTypes.STRING, allowNull: true },
+  publishedAt: { type: DataTypes.DATE, allowNull: true },
+  createdAt: DataTypes.DATE,
+  updatedAt: DataTypes.DATE,
+};
+
+const CmsPage = sequelize.define('CmsPage', cmsContentFields, {
+  tableName: 'cms_pages',
+  modelName: 'CmsPage',
+});
+
+const CmsPost = sequelize.define('CmsPost', cmsContentFields, {
+  tableName: 'cms_posts',
+  modelName: 'CmsPost',
+});
+
+const CmsService = sequelize.define(
+  'CmsService',
+  {
+    ...cmsContentFields,
+    icon: { type: DataTypes.STRING(80), allowNull: true },
+    sortOrder: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+  },
+  {
+    tableName: 'cms_services',
+    modelName: 'CmsService',
+  },
+);
+
+const CmsFaq = sequelize.define(
+  'CmsFaq',
+  {
+    id: { type: DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
+    question: { type: DataTypes.STRING(240), allowNull: false },
+    answer: { type: DataTypes.TEXT, allowNull: false },
+    category: { type: DataTypes.STRING(100), allowNull: false, defaultValue: '' },
+    sortOrder: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    status: {
+      type: DataTypes.ENUM('draft', 'published', 'archived'),
+      allowNull: false,
+      defaultValue: 'draft',
+    },
+    publishedAt: { type: DataTypes.DATE, allowNull: true },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+  },
+  {
+    tableName: 'cms_faqs',
+    modelName: 'CmsFaq',
+  },
+);
+
+const ContactSubmission = sequelize.define(
+  'ContactSubmission',
+  {
+    id: { type: DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
+    name: { type: DataTypes.STRING(120), allowNull: false },
+    email: { type: DataTypes.STRING(180), allowNull: false },
+    subject: { type: DataTypes.STRING(180), allowNull: false, defaultValue: '' },
+    message: { type: DataTypes.TEXT, allowNull: false },
+    status: {
+      type: DataTypes.ENUM('new', 'read', 'archived'),
+      allowNull: false,
+      defaultValue: 'new',
+    },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+  },
+  {
+    tableName: 'contact_submissions',
+    modelName: 'ContactSubmission',
+  },
+);
+
 User.hasMany(Portfolio, {
   foreignKey: 'userId',
   as: 'portfolios',
@@ -691,6 +786,111 @@ const reports = [
   },
 ];
 
+const publishedAt = new Date();
+
+const cmsPages = [
+  {
+    title: 'About Portify',
+    slug: 'about-portify',
+    excerpt: 'Learn how Portify helps creators publish polished portfolios.',
+    content:
+      'Portify is a portfolio platform for developers, designers and digital creators who want a focused public presence.',
+    status: 'published',
+    seoTitle: 'About Portify',
+    seoDescription: 'Learn more about the Portify portfolio platform.',
+    featuredImageUrl: null,
+    publishedAt,
+  },
+  {
+    title: 'Creator Guidelines',
+    slug: 'creator-guidelines',
+    excerpt: 'Best practices for publishing high-quality portfolio content.',
+    content:
+      'Keep project descriptions clear, use real screenshots, and keep contact links current.',
+    status: 'draft',
+    seoTitle: 'Creator Guidelines',
+    seoDescription: 'Guidelines for publishing content on Portify.',
+    featuredImageUrl: null,
+    publishedAt: null,
+  },
+];
+
+const cmsPosts = [
+  {
+    title: 'How to Build a Strong Portfolio',
+    slug: 'strong-portfolio',
+    excerpt: 'A practical checklist for portfolio structure, case studies and proof.',
+    content:
+      'Start with your strongest work, explain the problem, show the process, and make outcomes easy to scan.',
+    status: 'published',
+    seoTitle: 'How to Build a Strong Portfolio',
+    seoDescription: 'A practical guide for creating a stronger online portfolio.',
+    featuredImageUrl: null,
+    publishedAt,
+  },
+];
+
+const cmsServices = [
+  {
+    title: 'Portfolio Review',
+    slug: 'portfolio-review',
+    excerpt: 'Editorial review for creators who want sharper portfolio content.',
+    content:
+      'A structured review that checks clarity, project proof, visuals and conversion points.',
+    icon: 'search-check',
+    sortOrder: 1,
+    status: 'published',
+    seoTitle: 'Portfolio Review',
+    seoDescription: 'Get a structured portfolio review for better presentation.',
+    featuredImageUrl: null,
+    publishedAt,
+  },
+  {
+    title: 'Featured Creator Placement',
+    slug: 'featured-creator-placement',
+    excerpt: 'Prominent homepage and explore placement for selected creators.',
+    content:
+      'Featured placement helps polished portfolios reach more visitors in discovery sections.',
+    icon: 'star',
+    sortOrder: 2,
+    status: 'published',
+    seoTitle: 'Featured Creator Placement',
+    seoDescription: 'Promote selected creators with featured placement.',
+    featuredImageUrl: null,
+    publishedAt,
+  },
+];
+
+const cmsFaqs = [
+  {
+    question: 'Can I edit CMS content from the admin panel?',
+    answer:
+      'Yes. Admin CMS endpoints are available for pages, posts, services and FAQs.',
+    category: 'CMS',
+    sortOrder: 1,
+    status: 'published',
+    publishedAt,
+  },
+  {
+    question: 'Are draft pages public?',
+    answer: 'No. Public CMS endpoints only return published content.',
+    category: 'Publishing',
+    sortOrder: 2,
+    status: 'published',
+    publishedAt,
+  },
+];
+
+const contactSubmissions = [
+  {
+    name: 'Demo Visitor',
+    email: 'visitor@example.com',
+    subject: 'Partnership question',
+    message: 'I would like to learn more about featured creator placements.',
+    status: 'new',
+  },
+];
+
 async function seed() {
   try {
     await sequelize.authenticate();
@@ -831,6 +1031,12 @@ async function seed() {
     }
 
     await AnalyticsEvent.bulkCreate(analyticsEvents);
+
+    await CmsPage.bulkCreate(cmsPages);
+    await CmsPost.bulkCreate(cmsPosts);
+    await CmsService.bulkCreate(cmsServices);
+    await CmsFaq.bulkCreate(cmsFaqs);
+    await ContactSubmission.bulkCreate(contactSubmissions);
 
     console.log('Database seeded successfully.');
     console.log('Admin login: admin@portify.com / admin123');

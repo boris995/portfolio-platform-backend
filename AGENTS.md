@@ -708,4 +708,81 @@ Services
 FAQ
 Contact submissions
 Basic admin login
+
+---
+
+## CMS Work Log - 2026-05-09
+
+Status: paused at roughly 30% as requested.
+
+Implemented in this backend repository:
+- Kept the existing Express/Sequelize/MySQL stack instead of switching to FastAPI, because this project already has a working backend architecture.
+- Added CMS content models: `CmsPage`, `CmsPost`, `CmsService`, `CmsFaq`, and `ContactSubmission`.
+- Added CMS validation schemas with Zod for content, services, FAQs, and contact submissions.
+- Added CMS controller support for public published content, admin CRUD, and contact submissions.
+- Added public CMS routes under `/api/cms`.
+- Added admin CMS routes under `/api/admin/cms`, protected by existing admin auth middleware.
+- Updated `seed.js` to create CMS tables and demo CMS content.
+- Fixed MySQL `TEXT/LONGTEXT` default-value issue by keeping defaults in payload/controller logic instead of table definitions.
+- Fixed Express 5 route pattern issue by avoiding inline regex route params.
+
+Validation performed:
+- `npm run build` passed.
+- `npm run seed` passed.
+- Smoke tested public CMS endpoints, admin CMS list/create, and contact submission successfully.
+
+Next backend steps:
+- Add dedicated admin CMS frontend pages to consume these endpoints.
+- Add contact submission status update/archive endpoint.
+- Add optional media picker integration for CMS featured images.
+- Add pagination/search for admin CMS lists.
+
+---
+
+## CMS Work Log - 2026-05-09 Continued
+
+Status: CMS work advanced to roughly 80%; about 20% remains.
+
+Additional backend validation completed:
+- Rebuilt backend with `npm run build`.
+- Re-ran `npm run seed` after frontend CMS integration work.
+- Smoke tested public CMS collections and admin FAQ collection:
+  - `GET /api/cms/pages`
+  - `GET /api/cms/posts`
+  - `GET /api/cms/services`
+  - `GET /api/cms/faqs`
+  - `GET /api/admin/cms/faqs`
+
+No new backend feature files were added in this continuation beyond the CMS backend foundation from the previous step. Backend is ready for the current frontend CMS UI to consume.
+
+Remaining backend work for final 20%:
+- Add admin endpoint to update/archive contact submissions.
+- Add pagination/search/query filters for admin CMS resources.
+- Add richer media metadata or media picker support for CMS featured images.
+- Add tests around CMS validation and admin auth protection.
+
+---
+
+## CMS Work Log - 2026-05-09 Final Pass
+
+Status: CMS implementation completed for the planned scope.
+
+Completed in this backend repository:
+- Added admin contact submission status update endpoint:
+  - `PATCH /api/admin/cms/contact-submissions/:id`
+- Endpoint supports `new`, `read`, and `archived` statuses.
+- Rebuilt backend successfully with `npm run build`.
+- Re-ran `npm run seed` successfully.
+- Smoke tested:
+  - contact submission creation
+  - admin contact submission listing
+  - contact submission status update
+  - public CMS pages
+  - admin CMS pages
+- Re-ran seed after smoke test to leave local database clean.
+
+Remaining optional backend polish:
+- Add pagination/search/query filters for admin CMS resources.
+- Add automated tests around CMS validation and admin auth protection.
+- Add richer media metadata if CMS media library becomes a dedicated feature.
 Blog, media library, role system, preview mode, drag-and-drop sections — to su druge faze. Ako Codex-u odmah kažeš “napravi CMS”, vrlo lako će napraviti preširok, polufunkcionalan monstrum. Bolje ga natjerati da napravi dosadan, stabilan kostur. Dosadno je često znak da backend neće eksplodirati u petak u 23:40.
