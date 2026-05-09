@@ -1,5 +1,6 @@
-import express from 'express';
-import cors from 'cors';
+
+import express, { Request, Response } from "express";
+import cors from "cors";
 import type { ErrorRequestHandler, RequestHandler } from 'express';
 import path from 'path';
 import adminRoutes from './routes/adminRoutes';
@@ -35,12 +36,8 @@ app.use(
 
 app.use(express.json());
 app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
-
-app.get('/api/health', (_req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Server is running',
-  });
+app.get("/", (_req: Request, res: Response) => {
+  res.send("Backend is live");
 });
 
 app.use('/api/auth', authRoutes);
