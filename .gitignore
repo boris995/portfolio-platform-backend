@@ -34,3 +34,6 @@ uploads
 
 # Sequelize
 sequelize-meta.json
+
+#Other files
+test-backend.js
