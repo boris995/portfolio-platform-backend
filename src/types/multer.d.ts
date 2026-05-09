@@ -1,6 +1,6 @@
 declare namespace Express {
-  export namespace Multer {
-    export interface File {
+  namespace Multer {
+    interface File {
       fieldname: string;
       originalname: string;
       encoding: string;
