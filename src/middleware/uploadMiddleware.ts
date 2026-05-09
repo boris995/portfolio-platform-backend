@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import multer from 'multer';
+// import multer from 'multer';
 import type { Request } from 'express';
 import AppError from '../utils/AppError';
 
