@@ -4,6 +4,8 @@ import multer from 'multer';
 import type { Request } from 'express';
 import AppError from '../utils/AppError';
 
+type MulterFile = Express.Multer.File;
+
 const maxFileSize = 3 * 1024 * 1024;
 const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
 const uploadRoot = path.resolve(process.cwd(), 'uploads');
@@ -21,12 +23,12 @@ Object.values(folders).forEach((folder) => {
 });
 
 const storage = multer.diskStorage({
-  destination: (_req, file, callback) => {
+  destination: (_req: Request, file: MulterFile, callback) => {
     const field = file.fieldname as UploadTarget;
     const folder = folders[field] || folders.project;
     callback(null, path.join(uploadRoot, folder));
   },
-  filename: (_req, file, callback) => {
+  filename: (_req: Request, file: MulterFile, callback) => {
     const extension = path.extname(file.originalname).toLowerCase();
     const safeName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extension}`;
     callback(null, safeName);
@@ -35,7 +37,7 @@ const storage = multer.diskStorage({
 
 const fileFilter = (
   _req: Request,
-  file: Express.Multer.File,
+  file: MulterFile,
   callback: multer.FileFilterCallback,
 ) => {
   if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -54,7 +56,7 @@ export const upload = multer({
   },
 });
 
-export const toPublicUploadUrl = (file?: Express.Multer.File) => {
+export const toPublicUploadUrl = (file?: MulterFile) => {
   if (!file) {
     return undefined;
   }
