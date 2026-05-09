@@ -24,6 +24,13 @@ const folders = {
 
 type UploadTarget = keyof typeof folders;
 
+type MulterFile = {
+  fieldname: string;
+  originalname: string;
+  mimetype: string;
+  path: string;
+};
+
 Object.values(folders).forEach((folder) => {
   fs.mkdirSync(path.join(uploadRoot, folder), {
     recursive: true,
@@ -33,7 +40,7 @@ Object.values(folders).forEach((folder) => {
 const storage = multer.diskStorage({
   destination: (
     _req: Request,
-    file,
+    file: MulterFile,
     callback,
   ) => {
     const field = file.fieldname as UploadTarget;
@@ -49,7 +56,7 @@ const storage = multer.diskStorage({
 
   filename: (
     _req: Request,
-    file,
+    file: MulterFile,
     callback,
   ) => {
     const extension = path
@@ -67,7 +74,7 @@ const storage = multer.diskStorage({
 
 const fileFilter = (
   _req: Request,
-  file: Express.Multer.File,
+  file: MulterFile,
   callback: FileFilterCallback,
 ) => {
   if (
@@ -95,7 +102,7 @@ export const upload = multer({
 });
 
 export const toPublicUploadUrl = (
-  file?: Express.Multer.File,
+  file?: MulterFile,
 ) => {
   if (!file) {
     return undefined;
