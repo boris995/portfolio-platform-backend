@@ -800,4 +800,18 @@ Validation performed:
 - Smoke tested admin CMS filtering and pagination:
   - `GET /api/admin/cms/pages?search=about&status=published&page=1&limit=5`
   - `GET /api/admin/cms/contact-submissions`
+
+---
+
+## Deploy Fix Log - 2026-05-10 Express Types
+
+Fixed:
+- Removed custom `typeRoots` from `tsconfig.json`.
+- Render was treating `src/types/express/index.d.ts` as a replacement package for `express`, causing TypeScript errors like:
+  - `Module '"express"' has no exported member 'Request'`
+  - `Module '"express"' has no exported member 'Router'`
+- The Express request augmentation still works because `src` remains in the TypeScript `include` list.
+
+Validation performed:
+- Backend `npm run build` passed.
 Blog, media library, role system, preview mode, drag-and-drop sections — to su druge faze. Ako Codex-u odmah kažeš “napravi CMS”, vrlo lako će napraviti preširok, polufunkcionalan monstrum. Bolje ga natjerati da napravi dosadan, stabilan kostur. Dosadno je često znak da backend neće eksplodirati u petak u 23:40.
