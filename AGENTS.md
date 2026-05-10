@@ -797,7 +797,49 @@ Implemented after the final pass:
 
 Validation performed:
 - `npm run build` passed.
+
+---
+
+## CMS Work Log - 2026-05-10 Moderator Permission Fix
+
+Fixed:
+- Moved `/api/admin/cms` route registration before `/api/admin` in `src/app.ts`.
+- This prevents the admin-only router from catching moderator CMS requests before the CMS router can allow `admin` and `moderator`.
+
+Validation performed:
+- Backend `npm run build` passed.
+
+---
+
+## CMS Work Log - 2026-05-10 Moderator Role Follow-up
+
+Backend status for the moderator dashboard work:
+- Moderator role already exists in the user role enum and seed data.
+- CMS admin routes allow `admin` and `moderator` for CMS content management.
+- Admin-only moderation/user/contact-submission routes remain restricted to `admin`.
+- No new backend files were required for the dedicated frontend moderator dashboard.
+
+Reminder:
+- Local databases with older enum state should be reseeded or migrated before testing `moderator@portify.com / moderator123`.
+
+Validation performed:
+- `npm run build` passed.
 - Smoke tested admin CMS filtering and pagination:
   - `GET /api/admin/cms/pages?search=about&status=published&page=1&limit=5`
   - `GET /api/admin/cms/contact-submissions`
 Blog, media library, role system, preview mode, drag-and-drop sections — to su druge faze. Ako Codex-u odmah kažeš “napravi CMS”, vrlo lako će napraviti preširok, polufunkcionalan monstrum. Bolje ga natjerati da napravi dosadan, stabilan kostur. Dosadno je često znak da backend neće eksplodirati u petak u 23:40.
+---
+
+## CMS Work Log - 2026-05-09 CMS Upgrade Sprint
+
+Implemented in this backend repository:
+- Added public CMS collection search and pagination for pages, posts, services, and FAQs.
+- Public CMS collection responses now include pagination `meta`.
+- Added related/latest public content endpoint:
+  - `GET /api/cms/:resource/:slug/related`
+- Added admin quick status endpoint:
+  - `PATCH /api/admin/cms/:resource/:id/status`
+- Quick status updates support draft, published, and archived, and set `publishedAt` when publishing for the first time.
+
+Validation performed:
+- `npm run build` passed.

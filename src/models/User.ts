@@ -7,7 +7,7 @@ import {
 } from 'sequelize';
 import sequelize from '../config/database';
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'admin' | 'moderator' | 'user';
 export type UserStatus = 'active' | 'blocked';
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
@@ -45,7 +45,7 @@ User.init(
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM('admin', 'user'),
+      type: DataTypes.ENUM('admin', 'moderator', 'user'),
       allowNull: false,
       defaultValue: 'user',
     },

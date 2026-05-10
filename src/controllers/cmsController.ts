@@ -60,21 +60,56 @@ const toPositiveInt = (value: unknown, fallback: number) => {
   return Math.floor(parsed);
 };
 
-export async function getPublicCollection(req: Request, res: Response) {
-  const model = getModel(String(req.params.resource));
-  const order: Order =
-    req.params.resource === 'services' || req.params.resource === 'faqs'
-      ? [['sortOrder', 'ASC'], ['createdAt', 'DESC']]
-      : [['publishedAt', 'DESC'], ['createdAt', 'DESC']];
+const publicSearchFields = (resource: string) =>
+  resource === 'faqs'
+    ? ['question', 'answer', 'category']
+    : ['title', 'slug', 'excerpt', 'content'];
 
-  const items = await model.findAll({
-    where: publishedWhere,
-    order,
+const collectionOrder = (resource: string): Order =>
+  resource === 'services' || resource === 'faqs'
+    ? [['sortOrder', 'ASC'], ['createdAt', 'DESC']]
+    : [['publishedAt', 'DESC'], ['createdAt', 'DESC']];
+
+const buildSearchWhere = (resource: string, search: string): WhereOptions => {
+  if (!search) {
+    return {};
+  }
+
+  return {
+    [Op.or]: publicSearchFields(resource).map((field) => ({
+      [field]: { [Op.like]: `%${search}%` },
+    })),
+  };
+};
+
+export async function getPublicCollection(req: Request, res: Response) {
+  const resource = String(req.params.resource);
+  const model = getModel(resource);
+  const page = toPositiveInt(req.query.page, 1);
+  const limit = Math.min(toPositiveInt(req.query.limit, 50), 100);
+  const offset = (page - 1) * limit;
+  const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+  const where = {
+    ...publishedWhere,
+    ...buildSearchWhere(resource, search),
+  };
+
+  const { count, rows: items } = await model.findAndCountAll({
+    where,
+    order: collectionOrder(resource),
+    limit,
+    offset,
   });
 
   return res.status(200).json({
     success: true,
     data: items,
+    meta: {
+      page,
+      limit,
+      total: count,
+      totalPages: Math.ceil(count / limit),
+    },
   });
 }
 
@@ -94,8 +129,36 @@ export async function getPublicBySlug(req: Request, res: Response) {
   });
 }
 
+export async function getRelatedPublicContent(req: Request, res: Response) {
+  const resource = String(req.params.resource);
+  const model = getModel(resource);
+  const limit = Math.min(toPositiveInt(req.query.limit, 3), 12);
+  const current = await model.findOne({
+    where: { slug: req.params.slug, ...publishedWhere },
+  });
+
+  if (!current) {
+    throw new AppError('CMS content not found', 404);
+  }
+
+  const items = await model.findAll({
+    where: {
+      ...publishedWhere,
+      id: { [Op.ne]: current.get('id') },
+    },
+    order: collectionOrder(resource),
+    limit,
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: items,
+  });
+}
+
 export async function getAdminCollection(req: Request, res: Response) {
-  const model = getModel(String(req.params.resource));
+  const resource = String(req.params.resource);
+  const model = getModel(resource);
   const page = toPositiveInt(req.query.page, 1);
   const limit = Math.min(toPositiveInt(req.query.limit, 20), 100);
   const offset = (page - 1) * limit;
@@ -108,16 +171,7 @@ export async function getAdminCollection(req: Request, res: Response) {
   }
 
   if (search) {
-    const searchableFields =
-      req.params.resource === 'faqs'
-        ? ['question', 'answer', 'category']
-        : ['title', 'slug', 'excerpt', 'content'];
-
-    Object.assign(where, {
-      [Op.or]: searchableFields.map((field) => ({
-        [field]: { [Op.like]: `%${search}%` },
-      })),
-    });
+    Object.assign(where, buildSearchWhere(resource, search));
   }
 
   const { count, rows: items } = await model.findAndCountAll({
@@ -177,6 +231,34 @@ export async function updateAdminItem(req: Request, res: Response) {
   return res.status(200).json({
     success: true,
     message: 'CMS content updated',
+    data: item,
+  });
+}
+
+export async function updateAdminItemStatus(req: Request, res: Response) {
+  const model = getModel(String(req.params.resource));
+  const item = await model.findByPk(String(req.params.id));
+  const status = req.body.status as 'draft' | 'published' | 'archived' | undefined;
+
+  if (!item) {
+    throw new AppError('CMS content not found', 404);
+  }
+
+  if (!status || !['draft', 'published', 'archived'].includes(status)) {
+    throw new AppError('Valid CMS status is required', 400);
+  }
+
+  await item.update({
+    status,
+    publishedAt:
+      status === 'published'
+        ? item.get('publishedAt') || new Date()
+        : item.get('publishedAt'),
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: 'CMS status updated',
     data: item,
   });
 }

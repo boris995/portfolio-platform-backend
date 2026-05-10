@@ -48,7 +48,7 @@ const User = sequelize.define(
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM('admin', 'user'),
+      type: DataTypes.ENUM('admin', 'moderator', 'user'),
       allowNull: false,
       defaultValue: 'user',
     },
@@ -537,6 +537,12 @@ const users = [
     email: 'admin@portify.com',
     password: 'admin123',
     role: 'admin',
+  },
+  {
+    name: 'CMS Moderator',
+    email: 'moderator@portify.com',
+    password: 'moderator123',
+    role: 'moderator',
   },
   {
     name: 'Marko Ilic',
@@ -1040,6 +1046,7 @@ async function seed() {
 
     console.log('Database seeded successfully.');
     console.log('Admin login: admin@portify.com / admin123');
+    console.log('Moderator login: moderator@portify.com / moderator123');
     console.log('User login: marko@example.com / user123');
   } catch (error) {
     console.error('Seed failed:', error);

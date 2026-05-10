@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getPublicBySlug,
   getPublicCollection,
+  getRelatedPublicContent,
   submitContact,
 } from '../controllers/cmsController';
 import { validateBody } from '../middleware/validate';
@@ -12,6 +13,7 @@ const router = Router();
 
 router.post('/contact', validateBody(contactSubmissionSchema), asyncHandler(submitContact));
 router.get('/:resource', asyncHandler(getPublicCollection));
+router.get('/:resource/:slug/related', asyncHandler(getRelatedPublicContent));
 router.get('/:resource/:slug', asyncHandler(getPublicBySlug));
 
 export default router;

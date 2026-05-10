@@ -25,11 +25,10 @@ const publicUser = (user: User) => ({
 
 export async function register(req: Request, res: Response) {
   try {
-    const { name, email, password, role } = req.body as {
+    const { name, email, password } = req.body as {
       name?: string;
       email?: string;
       password?: string;
-      role?: UserRole;
     };
 
     if (!name || !email || !password) {
@@ -60,7 +59,7 @@ export async function register(req: Request, res: Response) {
       name,
       email,
       password: hashedPassword,
-      role: role === 'admin' ? 'admin' : 'user',
+      role: 'user',
     });
 
     return res.status(201).json({
